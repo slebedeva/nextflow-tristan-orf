@@ -39,11 +39,30 @@ process RIBOTIE {
     output:
     path "${data_folder}/*.npy"
     path "${data_folder}/*.csv"
-    path "${data_folder}/multiqc"
+    path "${data_folder}/multiqc", emit: multiqc
 
     script:
     """
     ribotie "${ribotie_config}" --num_workers 1
+    """
+
+}
+
+process MULTIQC {
+
+    publishDir params.outdir, mode: 'copy'
+
+    container 'crc1678inf/transcript_transformer_multiqc:v1.0.1'
+
+    input:
+    path multiqc_folder
+
+    output:
+    path "multiqc_report.html"
+
+    script:
+    """
+    multiqc "${multiqc_folder}"
     """
 
 }
